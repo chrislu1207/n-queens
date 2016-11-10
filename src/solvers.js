@@ -16,8 +16,19 @@
 
 
 window.findNRooksSolution = function(n) {
-  var solution = undefined; //fixme
+  var solution = [];
 
+  for (var i = 0; i < n; i++) {
+    var array = [];
+    for (var j = 0; j < n; j++) {
+      if (i === j) {
+        array.push(1);  
+      } else {
+        array.push(0);
+      }
+    }
+    solution.push(array);
+  }
   console.log('Single solution for ' + n + ' rooks:', JSON.stringify(solution));
   return solution;
 };
@@ -33,6 +44,36 @@ window.countNRooksSolutions = function(n) {
 // return a matrix (an array of arrays) representing a single nxn chessboard, with n queens placed such that none of them can attack each other
 window.findNQueensSolution = function(n) {
   var solution = undefined; //fixme
+
+  // if (n % 2 === 0) {    // if n is even
+  //   var queenLocs = [];
+  //   var colIndex = 1;
+
+  //   for (var i = 0; i < n; i++) { // calculate where queens should be
+  //     if (colIndex < n) {
+  //       queenLocs.push([i, colIndex]);
+  //       colIndex += 2;
+  //     } else {
+  //       colIndex = 0;
+  //       queenLocs.push([i, colIndex]);
+  //       colIndex += 2;
+  //     }
+  //   }
+
+  //   for (var j = 0; j < n; j++) { // construct solution matrix
+  //     var evenRow = [];
+  //     for (var k = 0; k < n; k++) {
+  //       if (queenLocs.includes([j, k])) { // if queen location, push 1
+  //         evenRow.push(1);
+  //       } else {
+  //         evenRow.push(0);
+  //       }
+  //     }
+  //     solution.push(evenRow);
+  //   }
+  // } else {              // if n is odd
+
+  // }
 
   console.log('Single solution for ' + n + ' queens:', JSON.stringify(solution));
   return solution;
