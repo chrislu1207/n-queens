@@ -200,7 +200,7 @@
       } else if (colIndex >= this.get('n')) {
         // console.log('Checking column', colIndex);
         for (var j = this.get('n') - 1; j > 0; j--) {          
-          if (colIndex - j < 4) {
+          if (colIndex - j < this.get('n')) {
             // console.log('Checking', j, 4 - j);
             if (this.get(colIndex - j)[j]) {
               count++;
