@@ -36,83 +36,87 @@ window.findNRooksSolution = function(n) {
 // return the number of nxn chessboards that exist, with n rooks placed such that none of them can attack each other
 window.countNRooksSolutions = function(n) {
   var solutionCount = 0;
+  var solutions = {};
+  var previousBoardState = undefined;
 
-  // if (n === 1) {
-  //   return 1;
-  // }
+  var boardInspector = function(board, rowIndex, colIndex) {
+    if (!board._isInBounds(rowIndex, colIndex)) {
+      console.log('Out of bounds, returning');
+      return;
+    }
 
-  // var boardInspector = function(board, n) { // helper function??
-  //   console.log('Entered boardInspector');
-  //   for (var j = 0; j < n; j++) {
-  //     for (var k = 0; k < n; k++) {
-  //       if (board.get(j)[k] === 0) {
-  //         board.togglePiece(j, k);
-  //         console.log('Toggled', j, k, 'to', board.get(j)[k]);
-  //       }
-  //       var numPieces = _.reduce(board.rows(), function(memo, row) {
-  //         return memo + _.reduce(row, function(memo, col) {
-  //           return memo + col;
-  //         }, 0);
-  //       }, 0);
-  //       console.log('Number of rooks:', numPieces);
-  //       if (board.hasAnyRooksConflicts()) {
-  //         board.togglePiece(j, k);
-  //         console.log('Has rook conflict. toggling back');
-  //         break;
-  //       } else if (numPieces === n) {
-  //         solutionCount++;
-  //         console.log('No conflicts, exiting loop');
-  //         break;
-  //       } else {
-  //         console.log('Going deeper');
-  //         boardInspector(board, n);  
-  //       }
-  //     }
-  //   }
-  // };
+    if (board.get(rowIndex)[colIndex] === 0) {
+      board.togglePiece(rowIndex, colIndex);
+    }
 
-  // for (var i = 1; i < n; i++) {     // for each n passed in, construct a nxn board
-  //   console.log('Starting iterations');
-  //   var board = new Board({n: i});
-  //   boardInspector(board, n); 
-  // }
+    var numPieces = _.reduce(board.rows(), function(memo, row) {
+      return memo + _.reduce(row, function(memo, col) {
+        return memo + col;
+      }, 0);
+    }, 0);
 
-  var boardInspector = function(board, n, rowIndex, colIndex) {
-    console.log('Inspecting board for n =', n);
-    board.togglePiece(rowIndex, colIndex);
-    console.log('Toggling', rowIndex, colIndex);
-    for (var i = 0; i < n; i++) {
-      for (var j = 0; j < n; j++) {
-        if (board.get(i)[j] === 0) {
-          board.togglePiece(i, j);
-          console.log(i, j, 'is 0, toggling to 1');
-        }
-        if (board.hasAnyRooksConflicts()) {
-          console.log('Conflict detected, returning');
-          board.togglePiece(i, j);
-          console.log('Toggling', i, j, 'back');
-          return;
-        }
-        var numPieces = _.reduce(board.rows(), function(memo, row) {
-          return memo + _.reduce(row, function(memo, col) {
-            return memo + col;
-          }, 0);
-        }, 0);
-        console.log('Number of rooks:', numPieces);
-        if (numPieces === n) {
-          console.log('Solution!');
-          solutionCount++;
-          return;
+    if (board.hasAnyRooksConflicts()) {
+      console.log('Conflict detected at', rowIndex, colIndex);
+      board.togglePiece(rowIndex, colIndex);
+      console.log('Untoggling', rowIndex, colIndex);
+      if (colIndex === n - 1) {
+        colIndex = 0;
+        console.log('At end of row, moving to', rowIndex + 1, colIndex);
+        boardInspector(board, rowIndex + 1, colIndex);
+      } else {
+        console.log('Moving on to', rowIndex, colIndex + 1);
+        boardInspector(board, rowIndex, colIndex + 1);
+      }
+    } else if (!board.hasAnyRooksConflicts()) {
+      console.log('No conflicts!');
+      if (!previousBoardState) {
+        previousBoardState = board;
+      }
+
+      if (numPieces === n) {
+        console.log('Number of pieces =', n, '!!SOLUTION FOUND!!  Solution:', board.rows());
+        solutions[JSON.stringify(board.rows())] = board.rows();
+        console.log('Total solutions now:', Object.keys(solutions).length);
+        console.log('Toggling solution off');
+        board.togglePiece(rowIndex, colIndex);
+        if (colIndex === n - 1) {
+          colIndex = 0;
+          console.log('At end of row, moving to', rowIndex + 1, colIndex);
+          boardInspector(board, rowIndex + 1, colIndex);
         } else {
-          console.log('No dice, inspecting board starting at', i, j + 1);
-          boardInspector(board, n, i, j + 1);
+          console.log('Moving on to', rowIndex, colIndex + 1);
+          boardInspector(board, rowIndex, colIndex + 1);
+        }
+      } else {
+        console.log('but only', numPieces, 'rooks');
+        if (colIndex === n - 1) {
+          colIndex = 0;
+          console.log('At end of row, moving to', rowIndex + 1, colIndex);
+          boardInspector(board, rowIndex + 1, colIndex);
+        } else {
+          console.log('Moving on to', rowIndex, colIndex + 1);
+          boardInspector(board, rowIndex, colIndex + 1);
         }
       }
     }
   };
 
-  var board = new Board({n: n});
-  boardInspector(board, n, 0, 0);
+  console.log('INSPECTING', n, 'BY', n, 'BOARD');
+  for (var i = 0; i < n; i++) {
+    for (var j = 0; j < n; j++) {
+      var board = new Board({n: n});
+      console.log('STARTING AT', i, j);
+      board.togglePiece(i, j);
+      boardInspector(board, 0, 0);
+    }
+  }
+
+  for (var key in solutions) {
+    console.log(key);
+  }
+
+  solutionCount = Object.keys(solutions).length;
+
   console.log('Number of solutions for ' + n + ' rooks:', solutionCount);
   return solutionCount;
 };
